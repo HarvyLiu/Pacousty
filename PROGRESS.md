@@ -14,6 +14,13 @@
 - **Understood (in my own words):**
 - **Next:**
 
+### 2026-09-14 — Module 0 Part 1 (WSL) — short session
+- **Did:** created `.venv`, activated it, `pip install cactus-needle`, verified with `python -c "import needle; print('needle ok')"` → `needle ok`.
+- **Worked:** venv shows `(.venv)` prefix; install + import clean, no errors.
+- **Didn't / errors seen (paste last lines):** none.
+- **Understood (in my own words):** venv = isolated Python folder (like the Docker idea but Python-only); the `(.venv)` prompt prefix means the shell is using the venv.
+- **Next:** Module 0 Part 2 — first Needle tools (`toy.py`).
+
 <!-- Example:
 ### 2026-09-14 — Module 0 — 60 min
 - **Did:** venv + pip install cactus-needle, ran Lagos weather example.

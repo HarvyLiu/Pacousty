@@ -7,10 +7,10 @@
 
 ## 1. Current status (update this block each time)
 
-- **Date:** 2026-09-12
-- **Phase:** Planning done, starting Module 0 (Windows practice OK, real build on Linux)
+- **Date:** 2026-09-14
+- **Phase:** Module 0 Part 1 in progress (WSL2 practice, real build stays on CachyOS Linux)
 - **Files:** `PLAN.md` ✅, `HANDOFF.md` ✅, `PROGRESS.md` ✅, `WINDOWS_PRACTICE.md` ✅, `AGENTS.md` ✅ (portable mentor instructions)
-- **Next step for user:** do `WINDOWS_PRACTICE.md` Part 1 on Windows (30-60 min), then copy `PLAN.md` + `AGENTS.md` + `PROGRESS.md` to Linux CachyOS machine and paste the Role prompt from `AGENTS.md` into Linux opencode.
+- **Next step for user:** run Part 2 `toy.py` (first Needle tools), paste output back.
 - **Blocking questions:** none. Open detail: exact Serpantium rice repo URL (not needed until Module 7).
 
 ## 2. Context (who / what / where)
@@ -80,3 +80,72 @@
 - **User asked:** write an Agents.md including the role part ("Be my workshop mentor. Follow PLAN.md strictly. I am a Python beginner — explain every tech word simply but use the correct term too. Go module by module starting at Module 0. One small step at a time.") so teaching works the same anywhere.
 - **Assistant did:** wrote `AGENTS.md` (role prompt verbatim + who/constraints + first-session procedure + 6 teaching rules + safety/scope + bookkeeping + Windows/Linux machine notes). Updated this HANDOFF status/decisions/inventory.
 - **Next:** user does WINDOWS_PRACTICE, then to Linux with PLAN.md + AGENTS.md + PROGRESS.md.
+
+### 2026-09-14 — Session 5: WSL orientation + Module 0 Part 1 start (WSL opencode)
+- **User asked:** read everything, follow instructions, on Windows WSL — what now? Then: yes, plus remember to write handoffs/mds.
+- **Assistant did:** read HANDOFF/PLAN/PROGRESS/WINDOWS_PRACTICE, verified WSL2 (`6.6.87.2-microsoft-standard-WSL2`, Python 3.14.6). Stated Module 0 / last next step / today's single goal per AGENTS.md. Explained WSL = practice-only (no Hyprland/PipeWire/daemon build here). Started Module 0 Part 1 (WSL bash venv flow). Updated `## 1. Current status`.
+- **Next:** user runs Part 1 commands, pastes output back; then debrief + PROGRESS.md entry.
+
+### 2026-09-14 — Session 5 (cont.): Part 1 answers received, verify pending
+- **User answered:** venv = Virtual Environment, keeps env same, like docker/Nyx; knows venv active via `(.venv)` prompt prefix.
+- **Assistant did:** confirmed answers (venv vs Docker/Nix distinction), asked for missing evidence: output of `python -c "import needle; print('needle ok')"`.
+- **Next:** user pastes verify output; then Part 2 (`toy.py`) or fix install error from last 5 lines.
+
+### 2026-09-14 — Session 5 (cont. 2): Part 1 verified, Part 2 started
+- **User reported:** `needle ok` — install + import clean.
+- **Assistant did:** marked Part 1 done, wrote PROGRESS.md entry, updated status, started Part 2 (`toy.py`: `add` + `get_weather` via Needle).
+- **Next:** user runs `python toy.py`, pastes output back; then docstring experiment + `greet` tool.
+
+### 2026-09-14 — Session 5 (cont. 3): waited on toy.py output
+- **User pasted:** the last 3 lines of `toy.py` source (agent + 2 print lines) — no terminal output yet.
+- **Assistant did:** clarified code vs output, re-asked for terminal text after `python toy.py`.
+- **Next:** user pastes what the terminal printed (or last 5 lines if error).
+
+### 2026-09-14 — Session 5 (cont. 4): toy.py traceback diagnosed
+- **Error (last line first):** `ValueError: Invalid repo type` from `huggingface_hub/file_download.py hf_hub_url`.
+- **Cause:** version mismatch — `cactus-needle 2.0.14` asks for its engine with `repo_type="model"`, but pip installed ancient `huggingface-hub 0.0.18` whose `REPO_TYPES = [None, dataset, space]` (no `"model"`; models = blank). User code is fine.
+- **Fix given:** `pip install --upgrade huggingface_hub`, then re-run `python toy.py`.
+- **Next:** user pastes upgrade + rerun output.
+
+### 2026-09-14 — Session 5 (cont. 5): upgrade fixed it, Needle ran with quirks
+- **User pasted:** `[]` then `[{'city': 'Taipei', 'temp_c': 27, 'sky': 'clear'}]`.
+- **Meaning:** fix worked (engine downloaded, tools called). Quirk 1: `[]` = Needle picked NO tool for "what is 4 + 5?". Quirk 2: asked Lagos, got `Taipei` = tiny model garbled the free-text city arg.
+- **Assistant did:** explained both lines, gave next single step: docstring-break experiment (`add` docstring → `"Do stuff."`, rerun, paste, restore).
+- **Next:** user pastes experiment output + answers docstring question; then `greet` tool.
+
+### 2026-09-14 — Session 5 (cont. 6): Taipei explained, "how does Needle work" asked
+- **User clarified:** they changed Lagos → Taipei themselves. Asked: where did 27°C come from — hallucination? Said docstring tells Needle what the tool does, wants under-the-hood how.
+- **Assistant explained:** 27 came from THEIR code — `get_weather` is hardcoded fake (`return {"city": city, "temp_c": 27, ...}`); Needle only picked tool + city, our function supplied temp. Taught tool-calling split (AI picks JSON, code executes) + Needle internals (45M params, CQ2 14MB engine, byte-level grammar → valid JSON, confidence).
+- **Next:** break experiment (`"""Do stuff."""`, rerun, paste, restore), then `greet` tool.
+
+### 2026-09-14 — Session 5 (cont. 7): break experiment surprised us
+- **User ran:** vague `add` docstring → `[]` for BOTH lines (weather broke too, not just math).
+- **Lesson:** assistant's prediction (weather survives) was wrong; evidence wins. Likely cause: tiny model scores ALL tools jointly + both `agent.run` calls share one agent memory, so one bad description poisons everything. Docstrings = "the whole game" (Cactus docs).
+- **Next:** restore good docstring, rerun, paste (expect both lines back); then `greet` tool.
+
+### 2026-09-14 — Session 5 (cont. 8): screenshot — longer docstring still [], plus stray "H"
+- **User showed:** even detailed `add` docstring still gives `[]` for math; weather fine. Asked about an `H` at line 4 in editor.
+- **Assistant explained:** `H` = Neovim UI (sign/number column), not file content — program runs, so file is valid; verify with `sed -n '4p' toy.py`. New hypothesis: vocab match — query "what is 4 + 5?" lacks verb "add"; tiny models match words literally.
+- **Next:** change query to `"add 4 and 5"`, rerun, paste both lines.
+
+### 2026-09-14 — Session 5 (cont. 9): vocab hypothesis CONFIRMED
+- **User ran:** query `"add 4 and 5"` → `[{'result': 9}]` + weather line. Earlier "what is 4 + 5?" → `[]`.
+- **Lesson:** tiny model matches vocabulary literally — query must contain the docstring's verb. Directly previews Module 3 voice-command wording.
+- **Next:** add third tool `greet(name)`, call via `agent.run("greet Ana")`, paste output; then Part 3.
+
+### 2026-09-14 — Session 5 (cont. 10): user summarized tool-calling, asked about JSON
+- **User said:** Needle matches tool description from prompt → runs function → outputs. Asked: what if not JSON format? Built own `listing(dir)` tool with bare `return` (screenshot).
+- **Assistant explained:** model side is ALWAYS JSON (grammar-forced); our function should return dicts (JSON-like) so downstream code gets named fields; bare `return` = `None` = nothing usable in results.
+- **Next:** finish `listing` body with `os.listdir`, run "list ..." query, paste output; then Part 3.
+
+### 2026-09-14 — Session 5 (cont. 11): output nesting explained
+- **User ran:** `listing` works (listed `/` once, workshop dir once — model guessed path differently per run). Asked: why output looks like `[{'contents': [...]}]` — lists vs dicts.
+- **Correction (user):** paths were USER-specified (`../` vs `./` queries across runs) — not model flakiness. Assistant's guess was wrong; record fixed.
+- **User asked:** why must results be a list? Answered: one slot per tool call — a turn can trigger several calls, uniform shape so code loops without special-casing.
+- **Assistant explained:** outside-in: outer `[]` = results list (one slot per tool call), `{}` = our dict, `'contents'` = our key, inner `[]` = `os.listdir`'s filename list. Noted path-guess flakiness → approval-gate reason.
+- **Next:** pretty-print experiment (`json.dumps` + index first file), paste output; then Part 3 errors.
+
+### 2026-09-14 — Session 5 (cont. 12): IndexError taught
+- **User ran:** pretty-print snippet with query "list the contents of ." → `[]`, then `IndexError: list index out of range` on `out[0]`.
+- **Cause:** model picked no tool for that phrasing (`out` = empty), so position 0 doesn't exist. Taught: last-line-first reading + guard with `if out:` before indexing (previews confidence gate).
+- **Next:** rerun with guard + earlier working phrasing, paste output; then Part 3 errors.
