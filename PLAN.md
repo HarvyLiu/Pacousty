@@ -1,6 +1,7 @@
 # Voice Assistant Workshop — PLAN.md
 ### Build a lightweight Linux voice assistant with Needle 2, from Python basics
 ### Target: CachyOS + Hyprland + Quickshell (Serpantium rice) + RTX 3050-Ti | 1 hr/week
+![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg) `SPDX-License-Identifier: GPL-3.0-only` — Copyright (C) 2026 Harvy — see [LICENSE](../LICENSE)
 
 > Give this file to your opencode on Linux. Tell it: "Be my workshop mentor. Follow this PLAN.md. Teach me module by module. Don't skip ahead."
 
@@ -151,7 +152,8 @@ Your mentor must run `needle playground` with you once so you see tool-calling v
 
 ```
 voice-assistant/
-  pyproject.toml        # deps: cactus-needle, faster-whisper, sounddevice, numpy
+  LICENSE               # GPL-3.0-only -- your code. Deps: cactus-needle Apache-2.0 + faster-whisper MIT (compatible with GPL-3.0, keep their NOTICE)
+  pyproject.toml        # deps: cactus-needle, faster-whisper, sounddevice, numpy; license = "GPL-3.0-only"
   README.md             # how to install + use
   assistant/
     __init__.py
@@ -265,6 +267,7 @@ You asked for flexibility — here's the rule so we don't derail:
 
 ### Decisions log (mentor appends here)
 - [2026-09-12] Initial plan: v1 = STT + Needle + approval, no TTS. STT = base.en. Threshold 0.70. Shortcut SUPER+H. (Change/add below.)
+- [2026-09-18] License: GPL-3.0-only (Copyright C 2026 Harvy). Copyleft chosen; no hosting need so not AGPL. Compatible with deps: cactus-needle Apache-2.0 + faster-whisper MIT are GPL-3.0 compatible (Apache-2.0 NOT compatible with GPL-2.0 only). When you create `pyproject.toml`, set `license = "GPL-3.0-only"` and `classifiers = ["License :: OSI Approved :: GNU General Public License v3 (GPLv3)"]`, keep third-party LICENSE/NOTICE when vendoring, add `SPDX-License-Identifier: GPL-3.0-only` header to new `.py` files.
 
 ---
 
@@ -312,6 +315,23 @@ Environment=NEEDLE_TELEMETRY=0
 
 [Install]
 WantedBy=default.target
+```
+
+`pyproject.toml` license snippet (add when you create the file on Linux):
+
+```toml
+[project]
+name = "voice-assistant"
+license = {text = "GPL-3.0-only"}
+classifiers = ["License :: OSI Approved :: GNU General Public License v3 (GPLv3)"]
+# keep deps permissive: cactus-needle (Apache-2.0) + faster-whisper (MIT) are GPL-3.0 compatible
+```
+
+Add to top of every new `assistant/*.py` :
+
+```python
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 Harvy
 ```
 
 ---
