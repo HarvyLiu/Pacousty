@@ -8,9 +8,9 @@
 ## 1. Current status (update this block each time)
 
 - **Date:** 2026-09-14
-- **Phase:** Module 0 Part 1 in progress (WSL2 practice, real build stays on CachyOS Linux)
-- **Files:** `PLAN.md` ✅, `HANDOFF.md` ✅, `PROGRESS.md` ✅, `WINDOWS_PRACTICE.md` ✅, `AGENTS.md` ✅ (portable mentor instructions)
-- **Next step for user:** run Part 2 `toy.py` (first Needle tools), paste output back.
+- **Phase:** Module 0 DONE on WSL (practice). Real build stays on CachyOS Linux. Next = Module 1 mic check on Linux.
+- **Files:** `PLAN.md` ✅, `HANDOFF.md` ✅, `PROGRESS.md` ✅ (2 entries: Part 1 + Parts 2-3), `WINDOWS_PRACTICE.md` ✅, `AGENTS.md` ✅, `toy.py` + `practice_errors.py` + `.venv` (WSL local)
+- **Next step for user:** move to CachyOS, copy `PLAN.md` + `AGENTS.md` + `PROGRESS.md` there, paste `AGENTS.md` Role prompt into Linux opencode. In WSL no more voice code — mic/daemon need PipeWire/Hyprland.
 - **Blocking questions:** none. Open detail: exact Serpantium rice repo URL (not needed until Module 7).
 
 ## 2. Context (who / what / where)
@@ -149,3 +149,27 @@
 - **User ran:** pretty-print snippet with query "list the contents of ." → `[]`, then `IndexError: list index out of range` on `out[0]`.
 - **Cause:** model picked no tool for that phrasing (`out` = empty), so position 0 doesn't exist. Taught: last-line-first reading + guard with `if out:` before indexing (previews confidence gate).
 - **Next:** rerun with guard + earlier working phrasing, paste output; then Part 3 errors.
+
+### 2026-09-14 — Session 5 (cont. 13): guard run done, into Part 3
+- **User reported:** guard experiment done (no output pasted, trusted).
+- **Assistant did:** moved to Part 3 (JSON + errors: `json.dumps`, bounded `set_volume`, `try`/`except`, `open_app` allowlist). Updated status to Part 3.
+- **Next:** user runs Part 3 challenge — `open_app` allowlist — pastes output; then Module 0 wrap check.
+
+### 2026-09-14 — Session 5 (cont. 14): Part 3 definitions answered + JSON-vs-dict confusion
+- **User asked:** why `json.dumps` if we already `return {"volume": 30}` in JSON format?
+- **Assistant clarified:** `return {"volume": 30}` is a Python `dict` (in RAM, single quotes when printed) — NOT JSON text. `json.dumps` → JSON text string (double quotes, the format the outside world uses). Needle/library handles the translation; we call `dumps` when we need a saveable/sendable string.
+- **User answered:** `raise` sets a specified error to be called in future — close, corrected to "creates the error *right now* when the `if` is true".
+- **User pasted:** `{"app": "firefox"}` / `caught: not allowed: chrome...` — `open_app` allowlist works; `except` caught the `ValueError`.
+- **Next:** Module 0 wrap check (6 terms + toy tool).
+
+### 2026-09-14 — Session 5 (cont. 15): Module 0 marked DONE
+- **User confirmed:** Module 0 wrap — "log done i guess". Pasted `open_app` success output as evidence.
+- **Assistant did:** logged PROGRESS.md entry for Parts 2-3 (~90 min total, all practice tasks + fixes), updated `## 1. Current status` to Module 0 DONE, noted WSL files (`toy.py`, `practice_errors.py`). Explained Module 1 requires real Linux (PipeWire `wpctl`/`pactl` + `sounddevice` not in WSL).
+- **Next:** user moves to CachyOS with `PLAN.md` + `AGENTS.md` + `PROGRESS.md`, pastes Role prompt.
+
+### 2026-09-14 — Session 5 (cont. 16): WSL toy files reuse asked
+- **User asked:** will `toy.py` / `practice_errors.py` be used in Module 1?
+- **Answer:** No — WSL toys stay as reference; real build on Linux creates fresh `voice-assistant/` layout per `PLAN.md §6` (`assistant/recorder.py`, `stt.py`, `tools.py`, `brain.py`, etc.) + new `.venv`. Don't copy WSL `.venv`/`toy.py` to Linux; copy only the three mds.
+- **User answered:** `json.dumps` = dump whole JSON to modify; `try`/`except` = if no error do try, if error do except.
+- **Assistant corrected:** `json.dumps` = dict → JSON text (a string), not modifying JSON; `json.loads` is the reverse. `try`/`except` = attempt block, on specific error (`ValueError`) jump to handler — confirmed user's core idea correct.
+- **Next:** user runs JSON-vs-dict demo (`print(dict)` vs `json.dumps`), pastes output; then `open_app` challenge.
