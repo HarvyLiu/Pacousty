@@ -7,10 +7,10 @@
 
 ## 1. Current status (update this block each time)
 
-- **Date:** 2026-09-14
-- **Phase:** Module 0 DONE on WSL (practice). Real build stays on CachyOS Linux. Next = Module 1 mic check on Linux.
-- **Files:** `PLAN.md` ✅, `HANDOFF.md` ✅, `PROGRESS.md` ✅ (2 entries: Part 1 + Parts 2-3), `WINDOWS_PRACTICE.md` ✅, `AGENTS.md` ✅, `toy.py` + `practice_errors.py` + `.venv` (WSL local)
-- **Next step for user:** move to CachyOS, copy `PLAN.md` + `AGENTS.md` + `PROGRESS.md` there, paste `AGENTS.md` Role prompt into Linux opencode. In WSL no more voice code — mic/daemon need PipeWire/Hyprland.
+- **Date:** 2026-09-21
+- **Phase:** Module 0 DONE. On CachyOS Linux (confirmed). Side-quest in progress: Stardance + Hackatime + Neovim hour tracking. Next = verify Hackatime heartbeat, then Module 1 mic check.
+- **Files:** `PLAN.md` ✅, `HANDOFF.md` ✅, `PROGRESS.md` ✅ (2 entries), `WINDOWS_PRACTICE.md` ✅, `AGENTS.md` ✅. Nvim: `~/.config/nvim/init.lua` + vim-wakatime (added 2026-09-21 with ==== opencode banner). No `~/.wakatime.cfg` yet (user must run hackatime setup page).
+- **Next step for user:** 1) visit hackatime.hackclub.com/setup while logged in, 2) restart nvim, code 2-3 min in workshop repo, 3) paste verify outputs back. Then link Hackatime project on Stardance project page + devlog.
 - **Blocking questions:** none. Open detail: exact Serpantium rice repo URL (not needed until Module 7).
 
 ## 2. Context (who / what / where)
@@ -173,3 +173,36 @@
 - **User answered:** `json.dumps` = dump whole JSON to modify; `try`/`except` = if no error do try, if error do except.
 - **Assistant corrected:** `json.dumps` = dict → JSON text (a string), not modifying JSON; `json.loads` is the reverse. `try`/`except` = attempt block, on specific error (`ValueError`) jump to handler — confirmed user's core idea correct.
 - **Next:** user runs JSON-vs-dict demo (`print(dict)` vs `json.dumps`), pastes output; then `open_app` challenge.
+
+### 2026-09-21 — Session 6: CachyOS confirmed + Stardance/Hackatime/Neovim side-quest start (CachyOS opencode)
+- **User asked:** read all instructions first + follow them; connect to Stardance Hack Club + record hours; uses Neovim; if editing nvim config use ==== banner with "This is added by opencode".
+- **Assistant did:** read HANDOFF/PLAN/PROGRESS/README + `~/.config/nvim/init.lua` (lazy.nvim, no lua/ folder, no ~/.wakatime.cfg). Verified CachyOS rolling, nvim 0.12.5. Researched Stardance (June1-Sept30 2026, Hackatime tracks, Stardance counts on devlog) + Hackatime Neovim docs (setup page → ~/.wakatime.cfg, then wakatime/vim-wakatime, git repo required). Asked 3 Qs per AGENTS.md (goal/status/nvim-edit).
+- **User answered:** goal = Stardance hours first, has Hackatime + Stardance project already, yes edit init.lua.
+- **Assistant did:** added `{ "wakatime/vim-wakatime", lazy = false }` to lazy.setup with ==== opencode banner (lines ~79-85). Updated ## 1 status to 2026-09-21 CachyOS side-quest.
+- **Next:** user visits hackatime.hackclub.com/setup, restarts nvim, codes 2-3 min, pastes verify outputs; then link project on Stardance page + devlog; then Module 1 mic check.
+
+### 2026-09-21 — Session 7: Hackatime dropped, Module 1 Step 1 start (CachyOS opencode)
+- **User said:** done, don't care about hackatime in workshop, start building on linux pc. Confirmed "yeah ok" to Module 1 Step 1 = 5-sec mic record only.
+- **Assistant verified:** PipeWire 1.6.8, default source `alsa_input.pci-0000_06_00.6.analog-stereo` vol 0.27, sink vol 0.00, RTX 3050-Ti 4096 MiB, Python 3.14.7. No `voice-assistant/` or `.venv` on Linux yet.
+- **Decision (minor, per PLAN §9):** Hackatime/Stardance hour-tracking out of workshop scope. Nvim vim-wakatime line stays (harmless) but no further tracking work. Focus = v1 Modules 1-5.
+- **Next:** user runs `timeout 5 pw-record` + `ls -lh/file` verify, pastes output; then playback check + Step 2 (venv + recorder.py).
+
+### 2026-09-21 — Session 7 (cont.): Step 1 record verified, playback pending
+- **User pasted:** `test.wav` 159k (eza). Assistant verified: `156K, RIFF WAVE, 16-bit mono 16000 Hz, 5.0 sec` — math matches (16000×2 bytes×5s ≈ 156K). Sink vol 0.00 = muted, source was 0.27 earlier.
+- **Next:** user unmutes sink to 50%, runs `pw-play test.wav`, confirms hearing self clearly; then Step 2 (venv + recorder.py).
+
+### 2026-09-21 — Session 7 (cont. 2): playback ok (room tone only), vol question asked
+- **User reported:** hears clearly but only environment sounds (didn't speak). Answered source=input/sink=output (correct). Asked why source is 0.27, auto?
+- **Answer given:** 0.27 = 27% mic gain on 0.0-1.0 scale, persisted by WirePlumber/desktop settings, not live auto-gain; adjustable via wpctl.
+- **Next:** user re-records WITH speech (count 1-5), plays back, pastes output; then Step 2 (venv + recorder.py).
+
+### 2026-09-21 — Session 7 (cont. 3): Step 1 accepted, Step 2a skeleton+venv started
+- **User reported:** counting clear via speakers (no earphones available — accepted as good enough for Step 1).
+- **Step 1 done:** 5-sec mono 16kHz WAV records + plays. Source/sink understood.
+- **Next:** Step 2a — `voice-assistant/` skeleton + `.venv` + `sounddevice numpy`; paste install output; then Step 2b `recorder.py`.
+
+### 2026-09-21 — Session 7 (cont. 4): __init__.py question asked
+- **User asked:** what is `__init__.py` and what does it do (didn't know at all).
+- **Answer given:** marks `assistant/` as a Python package (importable folder); empty file is fine; enables `from assistant.recorder import ...`.
+- **Still pending:** paste output of Step 2a install block (last 5 lines or full error).
+- **Next:** Step 2b `recorder.py` once venv confirmed.
