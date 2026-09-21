@@ -1,4 +1,4 @@
-# voice-assistant_workshop
+# Pacousty (still in workshop phase)
 
 ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)
