@@ -1,0 +1,13 @@
+# audio captures (personal voice data, regenerable — see recorder.py)
+*.wav
+
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# secrets (PLAN: keys live in ~/.config, never in repo)
+.env
+
+# runtime logs (Module 5 approver writes here)
+actions.log

@@ -38,6 +38,8 @@
 4. Plan changes allowed but controlled: minor anytime, medium after current module + cost note, major needs 5-line proposal. (PLAN §9)
 5. Extra files requested: this HANDOFF/LOG + PROGRESS template + Windows practice sheet. (2026-09-12)
 6. `AGENTS.md` created as portable mentor instructions (role prompt + teaching rules + safety + bookkeeping + machine notes) so any AI anywhere teaches the same way. (2026-09-12)
+7. Mic reality 2026-09-21: built-in mic works but background loud; Bluetooth earphones abandoned after ~2h debug (won't use on Linux). v1 proceeds with noisy mic; revisit positioning/gain in Module 2 silence-threshold challenge. No scope change.
+8. Auto-mode proposal 2026-09-21 (user request, OPTIONAL v2 only): disable y/N + use Laya (open 421M decision model, like Jev) for score + auto accept/deny. Status = PROPOSED, not approved for v1. Rule: finish Module 5 approval-gate first, then approve with acceptance test + VRAM check (Laya ~421M extra on 4GB GPU). v1 stays deny-by-default, every tool needs explicit y. (Medium scope per PLAN §9.)
 
 ## 5. Files inventory
 
@@ -206,3 +208,115 @@
 - **Answer given:** marks `assistant/` as a Python package (importable folder); empty file is fine; enables `from assistant.recorder import ...`.
 - **Still pending:** paste output of Step 2a install block (last 5 lines or full error).
 - **Next:** Step 2b `recorder.py` once venv confirmed.
+
+### 2026-09-21 — Session 7 (cont. 5): noisy mic accepted, venv ok, Laya auto-mode proposed as v2
+- **User reported:** voice clear but background loud; BT earphones abandoned (2h debug, no Linux use). `pip install sounddevice numpy` clean, no errors.
+- **Assistant did:** logged mic reality (Decision 7) + Laya auto-mode as OPTIONAL v2 proposal (Decision 8, medium scope, needs Module 5 done first + acceptance/VRAM check). Researched: Laya = open 421M ModernBERT decision model (choice/score/noul, ~33ms, calibrated, Apache-2.0, self-hosted) vs Jev = closed TypeSafe API used by eve/pi-fabric/langchain AutoMode for clear/caution gating.
+- **Next:** Step 2b — user creates `recorder.py`, records via Python, pastes output.
+
+### 2026-09-21 — Session 7 (cont. 6): user asked to teach the code
+- **User said:** hold on, you gotta teach me the code (recorder.py was dumped without walkthrough).
+- **Assistant does:** line-by-line teach (imports → constants → rec/wait → peak → wave save), then user creates + runs.
+- **Next:** user pastes `peak level` + answers peak question.
+
+### 2026-09-21 — Session 7 (cont. 7): sample-rate question asked
+- **User asked:** why 16000*5, what is 16000, capture frequency?
+- **Answer given:** sample rate = snapshots/sec; ×secs = total samples sd.rec needs; voice <8kHz so 16kHz enough (Nyquist); int16 → ~160KB.
+- **Next:** user creates recorder.py + runs, pastes peak.
+
+### 2026-09-21 — Session 7 (cont. 8): abstract sample-rate → concrete demo asked
+- **User said:** sample rate abstract, wants example data showing audio processing.
+- **Assistant does:** fake 5-sample numpy demo (no mic): snapshots → abs → peak, then scale to 80000.
+- **Next:** user pastes demo output + answers snapshot question.
+
+### 2026-09-21 — Session 7 (cont. 9): viz in recorder.py asked
+- **User asked:** add visualization of the process into recorder.py (after abstract→concrete demo).
+- **Assistant does:** text viz (first-10 snapshots + 50-char loudness bar), zero new deps, taught as new chunk.
+- **Next:** user runs updated recorder.py, pastes first-10 + bar + peak.
+
+### 2026-09-21 — Session 7 (cont. 10): viz output received, playback to close Step 2
+- **User pasted:** `first 10 = [0×10]`, bar 17/50 (≈11k peak), saved ok. Peak line not pasted but bar implies healthy voice later in clip.
+- **Meaning:** zeros = silence before counting started (normal); voice arrived later.
+- **Next:** user runs `pw-play test_py.wav` (from dir containing it), confirms voice clear → Step 2 done → Module 1 wrap.
+
+### 2026-09-21 — Session 7 (cont. 11): Module 1 DONE (noisy), Module 2 STT started
+- **User reported:** hears counting but not really clear (background loud). Says continue, don't get off track.
+- **Decision:** Module 1 accepted with caveat (records + saves + audible; clarity limited by built-in mic, no BT earphones). Noise mitigation deferred to Module 2 silence-threshold challenge.
+- **Next:** Module 2 Step 1 — install faster-whisper + `stt.py` (base.en) transcribes test_py.wav, paste text + time.
+
+### 2026-09-21 — Session 7 (cont. 12): stt.py teach asked
+- **User said:** explain the code for me (stt.py dumped without walkthrough).
+- **Assistant does:** line-by-line teach (argv → load → transcribe → join/print), then user installs + runs.
+- **Next:** user pastes stt output (text + timing) or error.
+
+### 2026-09-21 — Session 7 (cont. 13): time.time()/epoch question asked
+- **User asked:** what does seconds-since-1970 mean, still doesn't get time.time().
+- **Assistant does:** epoch demo (print → sleep 2 → print → subtract = elapsed stopwatch).
+- **Next:** user pastes demo output + answers elapsed question; then stt install+run.
+
+### 2026-09-21 — Session 7 (cont. 14): float16 question asked
+- **User asked:** still doesn't get float16, wants more specific explanation.
+- **Assistant does:** int16 (audio, known) → float32 vs float16 demo (nbytes + precision), VRAM math for base.en, why nets tolerate half precision.
+- **Next:** user pastes dtype demo + time demo (if not yet) + stt output.
+
+### 2026-09-21 — Session 7 (cont. 15): stt.py format-specifier traceback fixed
+- **Error (last line first):** `ValueError: Format specifier missing precision` at line 15 `:.f`.
+- **Cause:** f-string float format needs digits-before-f (`:.1f` = 1 decimal); user dropped the `1`. Line 24 already correct.
+- **Note:** HF Hub unauthenticated warning = slows downloads only, safe to ignore in v1.
+- **Next:** user fixes line 15 → `:.1f`, reruns, pastes text + timing.
+
+### 2026-09-21 — Session 7 (cont. 16): libcublas.so.12 missing → CPU fallback
+- **Error (last line first):** `RuntimeError: Library libcublas.so.12 is not found` in ctranslate2 encode.
+- **Cause:** faster-whisper asked GPU (cuda/float16) but NVIDIA CUDA-12 math lib (cuBLAS) isn't installed. User code fine. Driver exists (RTX 3050-Ti seen) but toolkit libs don't.
+- **Fix (one thing, no sudo):** line 13 → `device="cpu", compute_type="int8"`. GPU speed deferred to later (install CUDA libs + retest). Matches PLAN CPU fallback note.
+- **Next:** user edits line 13, reruns, pastes text + timing.
+
+### 2026-09-21 — Session 7 (cont. 17): user chose GPU path (CUDA install) over CPU fallback
+- **User said:** can install the big CUDA download, necessary for speed.
+- **Mentor agrees:** PLAN default = GPU FP16; CPU was only the fallback. Daemon target ~2-3s/turn needs GPU.
+- **Next:** user pastes `nvidia-smi | head` (driver CUDA ver) + `df -h /` (space) + `pacman -Ss cublas` (provider); then install.
+
+### 2026-09-23 — Session 8: CUDA 12 vs 13 version trap found
+- **User pasted:** driver 610.57 + CUDA UMD 13.3, disk 162G free, `extra/cuda 13.4.2-1`.
+- **Key finding:** `sudo pacman -S cuda` would give libcublas.so.13, but faster-whisper/ctranslate2 demands .so.12. Wrong plug. Fix = pip `nvidia-cublas-cu12` (small, no sudo, driver-13 runs cu12 libs fine via backward compat).
+- **Next:** user `pip install nvidia-cublas-cu12`, verifies lib file, reverts line 13 to cuda/float16, reruns stt.
+
+### 2026-09-23 — Session 8 (cont.): cu12 lib present, path note logged
+- **User pasted:** `libcublas.so.12` + `libcublasLt.so.12` present. Path note (corrected): user's cwd is `voice-assistant/` (build folder). All future commands use paths relative to there: venv = `source .venv/bin/activate`, scripts = `python assistant/*.py`. No absolute paths, no `voice-assistant/` prefix.
+- **Next:** user reverts line 13 to cuda/float16, runs stt with LD_LIBRARY_PATH=.../nvidia/cublas/lib, pastes text + timing.
+
+### 2026-09-23 — Session 8 (cont. 2): load ok (12s), encode still missing cublas
+- **User pasted:** `Loaded in 12.0s` then same `RuntimeError: libcublas.so.12 not found or cannot be loaded` at encode.
+- **Meaning:** weights copied to VRAM fine (load ≠ math); kernel launch (encode) needs cublas at runtime. Either LD_LIBRARY_PATH not set in that shell, or libcublas.so.12 itself has an unmet dep (e.g. cudart).
+- **Next:** user pastes `echo $LD_LIBRARY_PATH` + `ldd .../libcublas.so.12 | grep not found`; then install missing piece.
+
+### 2026-09-23 — Session 8 (cont. 3): GPU STT works (1.8s load, 0.6s), text mismatched (noise)
+- **User reported:** forgot the export; after export: `Loaded 1.8s, text 'Thank you so much. Have a nice day. Testing.', 0.6s, lang=en p=1.00`. Result ≠ what they said (counting).
+- **Meaning:** pipeline works on GPU; mismatch = Whisper hallucinating polite filler on noisy/short clip (predictor, not recorder). p=1.00 = confident English, not confident words.
+- **Next:** acceptance test — record "set volume to thirty" via recorder.py, transcribe, check text contains volume + thirty/30.
+
+### 2026-09-23 — Session 8 (cont. 4): Module 2 ACCEPTED, export persisted
+- **User pasted:** `Loaded 6.7s, text 'Set volume to 30. Set volume to 30.', 0.5s, en p=1.00`. "Yup fantastic".
+- **Acceptance:** contains volume + 30 → PASS 1/1 (said twice in 5s, fine). Noisy-mic caveat stands; 3/5 drill deferred.
+- **Fix applied:** appended LD_LIBRARY_PATH (cu12 lib via $VIRTUAL_ENV) to `.venv/bin/activate` so plain `source .venv/bin/activate` sets it. No more forgot-export bug.
+- **Next:** Module 3 brain — `tools.py` (3 frozen tools) + `brain.py` typed tests first, then live STT text.
+
+### 2026-09-23 — Session 8 (cont. 5): Module 3 Step 1 started (tools.py, dry-run)
+- **User said:** "ok lets goo".
+- **Plan:** Step 1 = `pip install cactus-needle` + `tools.py` (3 frozen tools, DRY-RUN: return dicts, no wpctl/launch until Module 5 approver). Step 2 = `brain.py` + 5 typed routing tests. Live STT text after.
+- **Next:** user pastes `needle ok` + creates tools.py.
+
+### 2026-09-23 — Session 8 (cont. 6): -> dict vs ["results"] question asked
+- **User asked:** WSL didn't use `-> dict`, but did use `["results"]` — what's the difference?
+- **Answer given:** annotation (definition-time promise, builds Needle schema) vs subscription (run-time extraction of results list from agent.run's return dict). Nesting drawn.
+- **Next:** user pastes `needle ok` + creates tools.py, answers dry-run/Literal Qs.
+
+### 2026-09-23 — Session 8 (cont. 7): are annotations comments? asked
+- **User asked:** are annotations comments?
+- **Answer given:** no — comments stripped pre-runtime, invisible; annotations stored in `__annotations__`, inspectable, Needle builds schema from them. Demo proves it.
+- **Next:** user pastes demo + `needle ok` + tools.py saved.
+
+### 2026-09-23 — Session 8 (cont. 8): Module 3 Step 2 started (brain.py + 5 typed tests)
+- **User said:** gets annotations, asks next step after tools.py.
+- **Plan:** `brain.py` = Needle(tools=[...]) + argv text + print results + keys (confidence key read from real output, not guessed). 5 typed routing tests = Module 3 acceptance core.
+- **Next:** user creates brain.py, runs 5 typed tests, pastes outputs.
