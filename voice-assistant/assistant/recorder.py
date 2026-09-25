@@ -9,7 +9,7 @@ SECS = 5
 OUT = "test_py.wav"
 
 print("Recording 5s...")
-audio = sd.rec(int(RATE*SECS), samplerate=RATE, channels=1, dtype='int16')
+audio = sd.rec(int(RATE*SECS), samplerate=RATE, channels=1, dtype='float16')
 sd.wait()
 peak = float(np.abs(audio).max())
 # 
